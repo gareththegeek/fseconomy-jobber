@@ -9,7 +9,7 @@ export const priceJobs = (groups: JobGroup[]): JobGroup[] => {
         let i = 0
         while (i < group.jobs.length && load < CAPACITY) {
             const job = group.jobs[i++]
-            if (job.Amount < CAPACITY - load) {
+            if (job.Amount <= CAPACITY - load) {
                 load += job.Amount
                 group.assignments += 1
                 group.value += job.Pay
