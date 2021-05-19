@@ -1,23 +1,38 @@
+import { Aircraft } from './aircraft'
 import { JobGroup } from './groupJobs'
 
-const CAPACITY = parseInt(process.env.CAPACITY || '0')
+export interface PricedJob extends JobGroup {
+    aircraft: Aircraft
+    value: number
+    hours: number
+    rental: number
+}
 
-export const priceJobs = (groups: JobGroup[]): JobGroup[] => {
+const FIXED_TIME_COST = 0.25
+
+export const priceJobs = (lookup: Record<string, number>, aircraft: Aircraft, groups: JobGroup[]): PricedJob[] => {
+    const result: PricedJob[] = []
     groups.forEach(group => {
-        group.jobs.sort((a, b) => b.Amount - a.Amount)
+        const duration = (group.distance / aircraft.speed) + FIXED_TIME_COST
+        const cost = lookup[group.from]
+        const priced = { ...group, aircraft, value: 0, hours: duration, rental: cost * duration }
+        priced.jobs.sort((a, b) => b.Amount - a.Amount)
+
         let load = 0
         let i = 0
-        while (i < group.jobs.length && load < CAPACITY) {
-            const job = group.jobs[i++]
-            if (job.Amount <= CAPACITY - load) {
+        while (i < priced.jobs.length && load < aircraft.capacity) {
+            const job = priced.jobs[i++]
+            if (job.Amount <= aircraft.capacity - load) {
                 load += job.Amount
-                group.assignments += 1
-                group.value += job.Pay
+                priced.assignments += 1
+                priced.value += job.Pay
             }
         }
-        if (group.assignments > 5) {
-            group.value = group.value * (1.0 - 0.01 * group.assignments)
+        if (priced.assignments > 5) {
+            priced.value = priced.value * (1.0 - 0.01 * priced.assignments)
         }
+        priced.value -= priced.rental
+        result.push(priced)
     })
-    return groups
+    return result.filter(a => a.value > 0)
 }

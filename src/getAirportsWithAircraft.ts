@@ -1,6 +1,5 @@
+import { Aircraft, AircraftType } from "./aircraft"
 import { call } from "./apiCall"
-
-export type AircraftType = 'Cessna 208 Caravan' | 'Socata TBM 930 (MSFS)' | 'Beechcraft King Air 350'
 
 interface AircraftResult {
     AircraftItems: {
@@ -40,16 +39,32 @@ interface AircraftResult {
     },
 }
 
-export const getAirportsWithAircraft = async (type: AircraftType): Promise<string[]> => {
-    const aircraft = await call<AircraftResult>({
+interface AirportRental {
+    icao: string
+    rental: number
+}
+
+const groupBy = (items: AirportRental[]): Record<string, number> => items.reduce(
+    (result, item) => ({
+        ...result,
+        [item.icao]: Math.min((result[item.icao] ?? 0xffffffff), item.rental)
+    }),
+    {} as Record<string, number>,
+);
+
+export const getAirportRentalLookup = async (aircraft: Aircraft): Promise<Record<string, number>> => {
+    const results = await call<AircraftResult>({
         query: 'aircraft',
         search: 'makemodel',
-        makemodel: type
+        makemodel: aircraft.name
     })
 
-    const airports = aircraft.AircraftItems.Aircraft
+    const rentals = results.AircraftItems.Aircraft
         .filter((a) => a.RentalDry[0] != '0.00' && a.RentedBy[0] === 'Not rented.')
-        .map((a) => a.Location[0])
+        .map((a) => ({
+            icao: a.Location[0],
+            rental: parseInt(a.RentalDry[0]) + parseInt(a.Bonus[0])
+        }))
 
-    return [...new Set(airports)]
+    return groupBy(rentals)
 }

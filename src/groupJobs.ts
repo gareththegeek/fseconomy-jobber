@@ -6,7 +6,6 @@ export interface JobGroup {
     from: string
     to: string
     distance: number
-    value: number
     assignments: number
     jobs: Job[]
 }

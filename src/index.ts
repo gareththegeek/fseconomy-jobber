@@ -1,20 +1,24 @@
 require('dotenv').config()
+import { AircraftType, getAircraft, getAircraftTypes } from './aircraft';
+import { jobDistance } from './airports';
 import { format } from './format';
-import { AircraftType, getAirportsWithAircraft } from './getAirportsWithAircraft'
+import { getAirportRentalLookup } from './getAirportsWithAircraft'
 import { getJobs } from './getJobs'
 import { groupJobs } from './groupJobs'
 import { priceJobs } from './priceJobs'
 
-const AIRCRAFT = process.env.AIRCRAFT as AircraftType
-
     ; (async () => {
-        const airports = await getAirportsWithAircraft(AIRCRAFT)
-        const jobs = await getJobs(airports)
-        const groups = groupJobs(jobs).filter(g => g.jobs.some(j => j.Amount > 1))
+        const promises = getAircraftTypes().map(async type => {
+            const aircraft = getAircraft(type)
+            const lookup = await getAirportRentalLookup(aircraft)
+            const jobs = (await getJobs(Object.keys(lookup))).filter(j => jobDistance(j.FromIcao, j.ToIcao) <= aircraft.range)
+            const groups = groupJobs(jobs).filter(g => g.jobs.some(j => j.Amount > 1))
 
-        const priced = priceJobs(groups)
-        priced.sort((a, b) => b.value - a.value)
-        console.info('FROM\tTO\tPAY\tDIST\t$/NM\tASSIGNMENTS')
-        console.info('----\t--\t---\t----\t----\t-----------')
-        priced.forEach(p => console.info(format(p)))
+            return priceJobs(lookup, aircraft, groups)
+        })
+        const all = (await Promise.all(promises)).flat()
+        all.sort((a, b) => (b.value / b.hours) - (a.value / a.hours))
+        console.info('AIRCRAFT                 \tFROM\tTO\tPAY\tDIST\t$/NM\t$/hr\tRENTAL\tASSIGNMENTS')
+        console.info('-------------------------\t----\t--\t---\t----\t----\t----\t------\t-----------')
+        all.slice(0, 100).forEach(p => console.info(format(p)))
     })()
