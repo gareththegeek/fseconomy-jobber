@@ -14,7 +14,7 @@ const AIRCRAFT = process.env.AIRCRAFT as AircraftType
 
         const priced = priceJobs(groups)
         priced.sort((a, b) => b.value - a.value)
-        console.info('FROM\tTO\tPAY\tDIST\tASSIGNMENTS')
-        console.info('----\t--\t---\t----\t-----------')
+        console.info('FROM\tTO\tPAY\tDIST\t$/NM\tASSIGNMENTS')
+        console.info('----\t--\t---\t----\t----\t-----------')
         priced.forEach(p => console.info(format(p)))
     })()

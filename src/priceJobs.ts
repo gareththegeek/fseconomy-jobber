@@ -1,6 +1,6 @@
 import { JobGroup } from './groupJobs'
 
-const CAPACITY = 13
+const CAPACITY = parseInt(process.env.CAPACITY || '0')
 
 export const priceJobs = (groups: JobGroup[]): JobGroup[] => {
     groups.forEach(group => {

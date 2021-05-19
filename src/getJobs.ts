@@ -75,7 +75,7 @@ export const getJobs = async (airports: string[]): Promise<Job[]> => {
     }))
         .filter(a => a.Type === 'Trip-Only' || a.Type === 'VIP')
         .filter(a => a.UnitType === 'passengers')
-        .filter(a => a.PtAssignment)
+        //.filter(a => a.PtAssignment)
         .filter(a => {
             const dist = jobDistance(a.FromIcao, a.ToIcao)
             return dist > MIN_DISTANCE && dist < MAX_DISTANCE
