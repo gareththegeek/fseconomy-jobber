@@ -15,7 +15,7 @@ const TBM_930 = 'Socata TBM 930 (MSFS)'
 const KINGAIR_350 = 'Beechcraft King Air 350'
 const CITATION_LONGITUDE = 'Cessna Citation Longitude'
 
-export type AircraftType = T_CESSNA_208 | T_TBM_930 | T_KINGAIR_350 | T_CITATION_LONGITUDE
+export type AircraftType = T_CESSNA_208 | /*T_TBM_930 |*/ T_KINGAIR_350 | T_CITATION_LONGITUDE
 
 const aircraft: Record<AircraftType, Aircraft> = {
     [CESSNA_208]: {
@@ -24,12 +24,12 @@ const aircraft: Record<AircraftType, Aircraft> = {
         speed: 185,
         range: 723
     },
-    [TBM_930]: {
-        name: TBM_930,
-        capacity: 7,
-        speed: 330,
-        range: 1135
-    },
+    // [TBM_930]: {
+    //     name: TBM_930,
+    //     capacity: 7,
+    //     speed: 330,
+    //     range: 1135
+    // },
     [KINGAIR_350]: {
         name: KINGAIR_350,
         capacity: 14,
