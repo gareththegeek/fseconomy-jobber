@@ -23,9 +23,16 @@ export const priceJobs = (lookup: Record<string, number>, aircraft: Aircraft, gr
         while (i < priced.jobs.length && load < aircraft.capacity) {
             const job = priced.jobs[i++]
             if (job.Amount <= aircraft.capacity - load) {
+                const isVip = job.Type === 'VIP'
+                if (isVip && priced.assignments > 0) {
+                    continue
+                }
                 load += job.Amount
                 priced.assignments += 1
                 priced.value += job.Pay
+                if (isVip) {
+                    break
+                }
             }
         }
         if (priced.assignments > 5) {
