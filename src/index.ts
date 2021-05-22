@@ -7,6 +7,11 @@ import { getJobs } from './getJobs'
 import { groupJobs } from './groupJobs'
 import { priceJobs } from './priceJobs'
 
+const printHeader = () => {
+    console.info('AIRCRAFT                 \tFROM\tTO  \tPAY  \tDIST\t$/NM\t$/hr \tRENTAL\tASSIGNMENTS')
+    console.info('-------------------------\t----\t----\t-----\t----\t----\t-----\t------\t-----------')
+}
+
     ; (async () => {
         const promises = getAircraftTypes().map(async type => {
             const aircraft = getAircraft(type)
@@ -17,9 +22,19 @@ import { priceJobs } from './priceJobs'
             return priceJobs(lookup, aircraft, groups)
         })
         const all = (await Promise.all(promises)).flat()
-        //all.sort((a, b) => (b.value / b.hours) - (a.value / a.hours))
-        all.sort((a, b) => b.value - a.value)
-        console.info('AIRCRAFT                 \tFROM\tTO  \tPAY  \tDIST\t$/NM\t$/hr \tRENTAL\tASSIGNMENTS')
-        console.info('-------------------------\t----\t----\t-----\t----\t----\t-----\t------\t-----------')
-        all.slice(0, 100).forEach(p => console.info(format(p)))
+        const highestPay = all.sort((a, b) => b.value - a.value).slice(0, 15)
+        const bestPayPerHour = all.sort((a, b) => (b.value / b.hours) - (a.value / a.hours)).slice(0, 15)
+        const highestPayShort = all.filter(x => x.distance <= 150).sort((a, b) => b.value - a.value).slice(0, 15)
+        
+        console.info('-HIGHEST PAY-\n')
+        printHeader()
+        highestPay.forEach(p => console.info(format(p)))
+
+        console.info('-HIGHEST PAY (LESS THAN 150nm)-\n')
+        printHeader()
+        highestPayShort.forEach(p => console.info(format(p)))
+
+        console.info('-BEST PER HOUR-\n')
+        printHeader()
+        bestPayPerHour.forEach(p => console.info(format(p)))
     })()
