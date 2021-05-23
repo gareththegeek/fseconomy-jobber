@@ -30,11 +30,11 @@ const printHeader = () => {
         printHeader()
         highestPay.forEach(p => console.info(format(p)))
 
-        console.info('-HIGHEST PAY (LESS THAN 150nm)-\n')
+        console.info('\n\n-HIGHEST PAY (LESS THAN 150nm)-\n')
         printHeader()
         highestPayShort.forEach(p => console.info(format(p)))
 
-        console.info('-BEST PER HOUR-\n')
+        console.info('\n\n-BEST PER HOUR-\n')
         printHeader()
         bestPayPerHour.forEach(p => console.info(format(p)))
     })()
