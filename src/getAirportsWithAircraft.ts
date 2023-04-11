@@ -58,7 +58,7 @@ export const getAirportRentalLookup = async (aircraft: Aircraft): Promise<Record
         search: 'makemodel',
         makemodel: aircraft.name
     })
-
+console.log(results)
     const rentals = results.AircraftItems.Aircraft
         .filter((a) => a.RentalDry[0] != '0.00' && a.RentedBy[0] === 'Not rented.')
         .map((a) => ({
